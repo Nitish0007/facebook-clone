@@ -18,18 +18,10 @@ class App extends Component {
           <Switch>
             <Route path="/login" component={Login} />
             <Route path="/">
-              <Navbar
-                optionActive="home"
-                user={this.props.user}
-                photo={this.props.photo}
-              />
+              <Navbar optionActive="home" />
               <div className="App_body">
                 <Sidebar />
-                <Feed
-                  user={this.props.user}
-                  photo={this.props.photo}
-                  uid={this.props.uid}
-                />
+                <Feed />
                 <Widgets />
               </div>
             </Route>
@@ -43,8 +35,6 @@ class App extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    photo: state.userPhoto,
-    uid: state.uid,
   };
 };
 

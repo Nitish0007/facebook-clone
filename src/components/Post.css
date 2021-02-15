@@ -2,7 +2,6 @@
   width: 500px;
   background-color: #fff;
   border-radius: 7px;
-  margin-bottom: 15px;
 }
 .post_top {
   display: flex;
@@ -17,16 +16,14 @@
 }
 .post_body p {
   padding: 0 20px;
-  margin-bottom: 10px;
 }
 
 .post_body img {
   width: 500px;
 }
 .post hr {
-  border: none;
-  border-top: 1px solid #ced0d4;
-  margin: 2px 15px;
+  border: 0.1px solid #eee;
+  margin: 4px 0;
 }
 .post_activity {
   display: flex;
@@ -39,13 +36,9 @@
   display: flex;
   align-items: flex-end;
 }
-
 .post_reaction p {
   margin-left: 5px;
 }
-/* .post_activity-comments {
-  cursor: pointer;
-} */
 .post_bottom {
   display: flex;
   justify-content: space-between;
