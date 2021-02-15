@@ -2,33 +2,13 @@ import { Avatar } from "@material-ui/core";
 import React, { Component } from "react";
 import "./Post.css";
 import Reaction from "./Reaction";
-import Comment from "./Comment";
-import db from "../firebase";
-import { connect } from "react-redux";
 
 import MessageIcon from "@material-ui/icons/ChatBubbleOutlineOutlined";
 
 class Post extends Component {
-  uploadingTimeout;
-  uploadReaction() {
-    clearTimeout(this.uploadingTimeout);
-    this.uploadingTimeout = setTimeout(() => {
-      db.collection("posts")
-        .doc(this.props.id)
-        .update({
-          reactions: this.state.reactions,
-          everyReaction: {
-            ...this.props.everyReaction,
-            [this.props.uid]: "" + this.state.yourReaction,
-          },
-        });
-    }, 3000);
-  }
-
   componentDidMount() {
     const changeReaction = (reaction) => {
       if (!reaction) return;
-      this.uploadReaction();
       const myState = { ...this.state };
       if (myState.reactions[myState.yourReaction]) {
         if (myState.reactions[myState.yourReaction] > 1) {
@@ -47,7 +27,6 @@ class Post extends Component {
       this.setState(myState);
     };
     const addReaction = () => {
-      this.uploadReaction();
       clearTimeout(openingTimeout);
       const myState = { ...this.state };
       if (myState.reactions[myState.yourReaction]) {
@@ -56,7 +35,7 @@ class Post extends Component {
         } else {
           delete myState.reactions[myState.yourReaction];
         }
-        myState.yourReaction = "";
+        myState.yourReaction = undefined;
       } else {
         if (myState.reactions.like) {
           myState.reactions.like += 1;
@@ -70,29 +49,32 @@ class Post extends Component {
 
     var openingTimeout, closingTimeout;
 
-    this.postReactionTab.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const type = e.target.dataset.type;
-      changeReaction(type);
-      this.postReactionTab.style.display = "none";
-      this.postReactionTab.classList.remove("post_reaction-tab-active");
+    document.querySelectorAll(".post_reaction-tab").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const type = e.target.dataset.type;
+        changeReaction(type);
+        item.style.display = "none";
+        item.classList.remove("post_reaction-tab-active");
+      });
     });
-
-    this.postLike.addEventListener("mouseenter", () => {
-      clearTimeout(closingTimeout);
-      this.postLike.children[0].style.display = "flex";
-      openingTimeout = setTimeout(() => {
-        this.postLike.children[0].classList.add("post_reaction-tab-active");
-      }, 700);
+    document.querySelectorAll(".post_like").forEach((item) => {
+      item.addEventListener("mouseenter", () => {
+        clearTimeout(closingTimeout);
+        item.children[0].style.display = "flex";
+        openingTimeout = setTimeout(() => {
+          item.children[0].classList.add("post_reaction-tab-active");
+        }, 850);
+      });
+      item.addEventListener("mouseleave", () => {
+        clearTimeout(openingTimeout);
+        closingTimeout = setTimeout(() => {
+          item.children[0].style.display = "none";
+          item.children[0].classList.remove("post_reaction-tab-active");
+        }, 400);
+      });
+      item.addEventListener("click", addReaction);
     });
-    this.postLike.addEventListener("mouseleave", () => {
-      clearTimeout(openingTimeout);
-      closingTimeout = setTimeout(() => {
-        this.postLike.children[0].style.display = "none";
-        this.postLike.children[0].classList.remove("post_reaction-tab-active");
-      }, 300);
-    });
-    this.postLike.addEventListener("click", addReaction);
   }
 
   state = {
@@ -106,8 +88,7 @@ class Post extends Component {
     let totalReactions = 0;
     let i = 0;
     for (let property in this.state.reactions) {
-      if (this.state.reactions[property] > 0)
-        postReactions.push(<Reaction key={i} type={property} />);
+      postReactions.push(<Reaction key={i} type={property} />);
       ++i;
       totalReactions += this.state.reactions[property];
     }
@@ -118,7 +99,7 @@ class Post extends Component {
           <Avatar src={this.props.profile} />
           <div>
             <h4 className="post_username">{this.props.username}</h4>
-            <p>{new Date(this.props.timestamp?.toDate()).toUTCString()}</p>
+            <p>{this.props.timestamp}</p>
           </div>
         </div>
         <hr />
@@ -129,19 +110,14 @@ class Post extends Component {
         <div className="post_activity">
           <div className="post_reaction">
             {postReactions}
-            <p>{totalReactions || " "}</p>
+            <p>{totalReactions}</p>
           </div>
-          <div className="post_activity-comments">
-            {this.state.comments} comments
-          </div>
+          <div>{this.state.comments} comments</div>
         </div>
         <hr />
         <div className="post_bottom">
-          <div ref={(el) => (this.postLike = el)} className="post_like">
-            <div
-              ref={(el) => (this.postReactionTab = el)}
-              className="post_reaction-tab"
-            >
+          <div className="post_like">
+            <div className="post_reaction-tab">
               <Reaction size="39" type="like" />
               <Reaction size="39" type="love" />
               <Reaction size="39" type="care" />
@@ -151,12 +127,9 @@ class Post extends Component {
               <Reaction size="39" type="angry" />
             </div>
 
+            {/* <LikeIcon /> */}
             <Reaction
-              type={
-                this.state.yourReaction == ""
-                  ? "default"
-                  : this.state.yourReaction
-              }
+              type={this.state.yourReaction || "default"}
               class={this.state.yourReaction}
             >
               {this.state.yourReaction || "like"}
@@ -167,16 +140,9 @@ class Post extends Component {
           </div>
         </div>
         <hr />
-        <Comment />
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    uid: state.uid,
-  };
-};
-
-export default connect(mapStateToProps)(Post);
+export default Post;

@@ -12,6 +12,8 @@ import ForumIcon from "@material-ui/icons/Forum";
 import NotificationsActiveIcon from "@material-ui/icons/NotificationsActive";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
+import { connect } from "react-redux";
+
 class Navbar extends Component {
   componentDidMount() {
     document
@@ -78,4 +80,11 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+    photo: state.userPhoto,
+  };
+};
+
+export default connect(mapStateToProps)(Navbar);

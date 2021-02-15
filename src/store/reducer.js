@@ -2,7 +2,6 @@ import * as actionTypes from "./action";
 const initialState = {
   user: null,
   userPhoto: "",
-  uid: "",
 };
 
 const reducer = (state = initialState, action) => {
@@ -11,7 +10,6 @@ const reducer = (state = initialState, action) => {
       let myState = { ...initialState };
       myState.user = action.name;
       myState.userPhoto = action.photo;
-      myState.uid = action.uid;
       return myState;
     }
     default:
